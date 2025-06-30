@@ -3,5 +3,4 @@ export interface Sport {
   name: string;
   subscription_price: number;
   allowed_gender: string;
-
 }

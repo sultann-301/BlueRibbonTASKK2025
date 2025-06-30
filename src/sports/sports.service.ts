@@ -10,15 +10,17 @@ export class SportsService {
   constructor(@Inject(CACHE_MANAGER) private cache: Cache) {}
 
   async getSports(): Promise<Sport[]> {
-    const cached = (await this.cache.get('sports')) as Sport[] | undefined;
+    const cached: Sport[] | undefined = await this.cache.get('sports');
     if (cached) return cached;
 
-    const { data, error } = await supabase.from('sports').select('name, subscription_price, allowed_gender');
+    const { data, error } = await supabase
+      .from('sports')
+      .select('name, subscription_price, allowed_gender');
     if (error) {
       throw new Error(`Error fetching sports: ${error.message}`);
     }
     console.log('Fetched sports:', data);
-    await (this.cache).set('sports', data, 60); // cache for 60s
+    await this.cache.set('sports', data, 60); // cache for 60s
     return data as Sport[];
   }
   /**
@@ -36,12 +38,41 @@ export class SportsService {
       .from('sports')
       .insert([sportData])
       .select('*')
-      .single();
+      .single<Sport>();
 
     if (error) {
       throw new Error(`Error creating sport: ${error.message}`);
     }
     console.log('Created sport:', data);
-    return data as Sport;
+    return data;
+  }
+
+  async updateSport(id: string, sportData: Partial<Sport>) {
+    const { data, error } = await supabase
+      .from('sports')
+      .update(sportData)
+      .eq('id', id)
+      .select('*')
+      .single<Sport>();
+    if (error) {
+      throw new Error(`Error updating sport: ${error.message}`);
+    }
+    console.log('Updated sport:', data);
+    return data;
+  }
+
+  async deleteSport(id: string) {
+    const { data, error } = await supabase
+      .from('sports')
+      .delete()
+      .eq('id', id)
+      .select('*')
+      .single<Sport>();
+
+    if (error) {
+      throw new Error(`Error deleting sport: ${error.message}`);
+    }
+    console.log('Deleted sport:', data);
+    return data;
   }
 }

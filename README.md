@@ -1,98 +1,419 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Getting Started
+ ```bash
+ npm install
+ ```
+ Then add a ``.env`` file in the root of the project with the following
+ ```SUPABASE_URL=https://yoursupabasedb.supabase.co ```
+```SUPABASE_SERVICE_ROLE_KEY=your-service-role-key```
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Finally run
+ ```npm run start```
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Then create a second terminal tab, to hit the API endpoints with ```curl -X```.
 
-## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+# Members API Documentation
 
-## Project setup
+A NestJS-based REST API for managing gym/club members with full CRUD operations and relationship tracking capabilities.
 
-```bash
-$ npm install
+## Database Schema
+
+The `members` table structure:
+
+```sql
+create table members (
+  id SERIAL primary key,
+  first_name text not null,
+  last_name text not null,
+  gender text check (gender in ('male', 'female')),
+  birthdate date,
+  subscription_date timestamp DEFAULT NOW()
+);
+
+alter table members
+add column central_member_id int references members(id) on delete set null;
 ```
 
-## Compile and run the project
+### Field Descriptions
 
-```bash
-# development
-$ npm run start
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | SERIAL | Yes | Auto-incrementing primary key |
+| `first_name` | TEXT | Yes | Member's first name |
+| `last_name` | TEXT | Yes | Member's last name |
+| `gender` | TEXT | No | Member's gender ('male' or 'female') |
+| `birthdate` | DATE | No | Member's date of birth |
+| `subscription_date` | TIMESTAMP | No | Auto-set to current timestamp |
+| `central_member_id` | INTEGER | No | Reference to another member (for family/group relationships) |
 
-# watch mode
-$ npm run start:dev
+## API Endpoints
 
-# production mode
-$ npm run start:prod
+Base URL: `/members`
+
+### Create Member
+
+Creates a new member in the system.
+
+- **Method:** `POST`
+- **Endpoint:** `/members/create`
+- **Request Body:** `CreateMemberDto`
+- **Response:** Created member object
+
+```json
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "gender": "male",
+  "birthdate": "1990-01-15",
+  "central_member_id": null
+}
 ```
 
-## Run tests
+### Get Member by ID
 
-```bash
-# unit tests
-$ npm run test
+Retrieves a specific member by their ID.
 
-# e2e tests
-$ npm run test:e2e
+- **Method:** `GET`
+- **Endpoint:** `/members/:id`
+- **Parameters:** 
+  - `id` (string) - Member ID
+- **Response:** Member object
 
-# test coverage
-$ npm run test:cov
+### Update Member
+
+Updates an existing member's information.
+
+- **Method:** `PATCH`
+- **Endpoint:** `/members/update/:id`
+- **Parameters:** 
+  - `id` (string) - Member ID
+- **Request Body:** `UpdateMemberDto` (partial member data)
+- **Response:** Updated member object
+
+```json
+{
+  "first_name": "Jane",
+  "gender": "female"
+}
 ```
 
-## Deployment
+### Delete Member
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Removes a member from the system.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- **Method:** `DELETE`
+- **Endpoint:** `/members/delete/:id`
+- **Parameters:** 
+  - `id` (string) - Member ID
+- **Response:** Deletion confirmation
 
+## Features
+
+- ✅ Full CRUD operations (Create, Read, Update, Delete)
+- ✅ Input validation with DTOs
+- ✅ Gender constraint validation
+- ✅ Automatic subscription date tracking
+- ✅ Self-referencing relationships for family/group memberships
+- ✅ Cascading delete protection (SET NULL on central_member_id)
+
+## Usage Examples
+
+### Creating a Member
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+curl -X POST http://localhost:3000/members/create \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "Alice",
+    "last_name": "Smith",
+    "gender": "female",
+    "birthdate": "1985-03-20"
+  }'
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Getting a Member
+```bash
+curl -X GET http://localhost:3000/members/1
+```
 
-## Resources
+### Updating a Member
+```bash
+curl -X PATCH http://localhost:3000/members/update/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "Alicia"
+  }'
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### Deleting a Member
+```bash
+curl -X DELETE http://localhost:3000/members/delete/1
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Notes
+- The `central_member_id` field allows for hierarchical relationships (e.g., family memberships)
+- Gender field is optional but restricted to 'male' or 'female' values
+- Subscription date is automatically set when a member is created
 
-## Support
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
-## License
+# Sports API Endpoints
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Base URL
+```
+/sports
+```
+
+## Endpoints
+
+### Create Sport
+Creates a new sport in the system.
+
+- **URL:** `/sports/create`
+- **Method:** `POST`
+- **Body:** `CreateSportDto`
+- **Response:** `Sport`
+
+**Example Request:**
+```json
+POST /sports/create
+Content-Type: application/json
+
+{
+  "name": "Basketball",
+  "subscription_price": 29.99,
+  "allowed_gender": "male"
+}
+```
+
+### Get All Sports
+Retrieves all sports from the system.
+
+- **URL:** `/sports/all`
+- **Method:** `GET`
+- **Response:** `Sport[]`
+
+**Example Request:**
+```json
+GET /sports/all
+```
+
+### Update Sport
+Updates an existing sport by ID.
+
+- **URL:** `/sports/update/:id`
+- **Method:** `PATCH`
+- **URL Parameters:** 
+  - `id` (string) - ID of the sport to update
+- **Body:** `UpdateSportDto`
+- **Response:** `Sport`
+
+**Example Request:**
+```json
+PATCH /sports/update/123
+Content-Type: application/json
+
+{
+  "name": "Updated Basketball",
+  "subscription_price": 35.00
+}
+```
+
+### Delete Sport
+Deletes a sport by ID.
+
+- **URL:** `/sports/delete/:id`
+- **Method:** `DELETE`
+- **URL Parameters:** 
+  - `id` (string) - ID of the sport to delete
+- **Response:** `Sport`
+
+**Example Request:**
+```json
+DELETE /sports/delete/123
+```
+
+## Data Types
+
+### Sport Interface
+```typescript
+interface Sport {
+  id: number;
+  name: string;
+  subscription_price: number;
+  allowed_gender: 'male' | 'female';
+}
+```
+
+### DTOs
+- `CreateSportDto` - Data transfer object for creating sports
+- `UpdateSportDto` - Data transfer object for updating sports (partial fields)
+
+## Field Constraints
+- `name` - Required text field
+- `subscription_price` - Numeric value for subscription cost
+- `allowed_gender` - Must be either 'male' or 'female'
+
+## Notes
+- All endpoints return JSON responses
+- The `id` parameter is a serial integer (auto-incrementing)
+- The frontend should pass the sport ID (from database) to the update/delete endpoints
+
+
+
+# Subscriptions API Documentation
+
+## Database Schema
+
+The `subscriptions` table structure:
+
+```sql
+create table subscriptions (
+  member_id int references members(id) on delete cascade,
+  sport_id int references sports(id) on delete cascade,
+  type text check (type in ('group', 'private')),
+  primary key (member_id, sport_id) -- Prevent duplicates
+);
+```
+
+### Field Descriptions
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `member_id` | INTEGER | Yes | Foreign key reference to members table |
+| `sport_id` | INTEGER | Yes | Foreign key reference to sports table |
+| `type` | TEXT | No | Subscription type ('group' or 'private') |
+
+### Key Features
+- **Composite Primary Key:** Prevents duplicate subscriptions (one member per sport)
+- **Cascade Delete:** Automatically removes subscriptions when member or sport is deleted
+- **Type Constraint:** Subscription type restricted to 'group' or 'private'
+
+## API Endpoints
+
+Base URL: `/subscriptions`
+
+### Subscribe Member
+
+Subscribes a member to a sport or activity.
+
+- **Method:** `POST`
+- **Endpoint:** `/subscriptions/subscribe`
+- **Request Body:** `SubscribeMemberDto`
+- **Response:** Subscription confirmation object
+
+**Request Body Example:**
+```json
+{
+  "member_id": 1,
+  "sport_id": 3,
+  "type": "group"
+}
+```
+
+**Response Example:**
+```json
+{
+  "member_id": 1,
+  "sport_id": 3,
+  "type": "group",
+  "message": "Member successfully subscribed"
+}
+```
+
+### Unsubscribe Member
+
+Removes a member's subscription from a sport or activity.
+
+- **Method:** `DELETE`
+- **Endpoint:** `/subscriptions/unsubscribe`
+- **Request Body:** `UnsubscribeMemberDto`
+- **Response:** Unsubscription confirmation object
+
+**Request Body Example:**
+```json
+{
+  "member_id": 1,
+  "sport_id": 3
+}
+```
+
+**Response Example:**
+```json
+{
+  "message": "Member successfully unsubscribed",
+  "member_id": 1,
+  "sport_id": 3
+}
+```
+
+## Features
+
+- ✅ Member subscription management
+- ✅ Sport/activity enrollment
+- ✅ Input validation with DTOs
+- ✅ Subscription tracking
+- ✅ Clean unsubscribe process
+
+## Usage Examples
+
+### Subscribing a Member
+```bash
+curl -X POST http://localhost:3000/subscriptions/subscribe \
+  -H "Content-Type: application/json" \
+  -d '{
+    "member_id": 1,
+    "sport_id": 2,
+    "type": "group"
+  }'
+```
+
+### Unsubscribing a Member
+```bash
+curl -X DELETE http://localhost:3000/subscriptions/unsubscribe \
+  -H "Content-Type: application/json" \
+  -d '{
+    "member_id": 1,
+    "sport_id": 2
+  }'
+```
+
+## Data Transfer Objects (DTOs)
+
+### SubscribeMemberDto
+Expected fields for subscribing a member:
+- `member_id` (number) - ID of the member to subscribe
+- `sport_id` (number) - ID of the sport/activity
+- `type` (string) - Subscription type ('group' or 'private')
+
+### UnsubscribeMemberDto
+Expected fields for unsubscribing a member:
+- `member_id` (number) - ID of the member to unsubscribe
+- `sport_id` (number) - ID of the sport/activity
+
+## Notes
+
+- Both endpoints use request body data instead of URL parameters for flexibility
+- The DELETE method is used for unsubscribe but still accepts a request body
+- Integer IDs are used for member_id and sport_id references
+- Composite primary key prevents duplicate subscriptions (one member per sport)
+- Cascade delete automatically removes subscriptions when referenced member or sport is deleted
+- Subscription type is constrained to 'group' or 'private' sessions
+- No separate subscription ID exists; the combination of member_id and sport_id serves as the unique identifier
+
+## Related APIs
+
+This subscription system works in conjunction with:
+- **Members API** - For managing member data
+- **Sports API** - For managing available sports and activities
+
+## Error Handling
+
+Common error scenarios:
+- Invalid member_id or sport_id (integer format required)
+- Member already subscribed to the sport (duplicate subscription)
+- Member not currently subscribed (for unsubscribe operations)
+- Invalid subscription type (must be 'group' or 'private')
+- Missing required fields in request body
+- Referenced member or sport does not exist
