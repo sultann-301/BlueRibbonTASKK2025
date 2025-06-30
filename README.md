@@ -1,4 +1,5 @@
 # Getting Started
+First, in the root directory of the project run:
  ```bash
  npm install
  ```
