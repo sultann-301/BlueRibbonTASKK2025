@@ -1,10 +1,15 @@
 # Getting Started
+First, in the root directory of the project run:
  ```bash
  npm install
  ```
  Then add a ``.env`` file in the root of the project with the following
- ```SUPABASE_URL=https://yoursupabasedb.supabase.co ```
-```SUPABASE_SERVICE_ROLE_KEY=your-service-role-key```
+ ```bash
+ SUPABASE_URL=https://yoursupabasedb.supabase.co 
+ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
+Next, you need to open the linked supabase database, and copy the ```schema.sql``` file into the SQL editor and run the queries to create the table.
+The ```schema.sql``` file can be found in the root directory of this repository.
 
 Finally run
  ```npm run start```
@@ -15,36 +20,6 @@ Then create a second terminal tab, to hit the API endpoints with ```curl -X```.
 # Members API Documentation
 
 A NestJS-based REST API for managing gym/club members with full CRUD operations and relationship tracking capabilities.
-
-## Database Schema
-
-The `members` table structure:
-
-```sql
-create table members (
-  id SERIAL primary key,
-  first_name text not null,
-  last_name text not null,
-  gender text check (gender in ('male', 'female')),
-  birthdate date,
-  subscription_date timestamp DEFAULT NOW()
-);
-
-alter table members
-add column central_member_id int references members(id) on delete set null;
-```
-
-### Field Descriptions
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | SERIAL | Yes | Auto-incrementing primary key |
-| `first_name` | TEXT | Yes | Member's first name |
-| `last_name` | TEXT | Yes | Member's last name |
-| `gender` | TEXT | No | Member's gender ('male' or 'female') |
-| `birthdate` | DATE | No | Member's date of birth |
-| `subscription_date` | TIMESTAMP | No | Auto-set to current timestamp |
-| `central_member_id` | INTEGER | No | Reference to another member (for family/group relationships) |
 
 ## API Endpoints
 
@@ -265,6 +240,7 @@ interface Sport {
 # Subscriptions API Documentation
 
 ## Database Schema
+To solve the bonus for not allowing duplicate subscriptions to the same sport the following schema was used:
 
 The `subscriptions` table structure:
 
@@ -286,7 +262,7 @@ create table subscriptions (
 | `type` | TEXT | No | Subscription type ('group' or 'private') |
 
 ### Key Features
-- **Composite Primary Key:** Prevents duplicate subscriptions (one member per sport)
+- **Composite Primary Key:** Prevents duplicate subscriptions (one member per sport) 
 - **Cascade Delete:** Automatically removes subscriptions when member or sport is deleted
 - **Type Constraint:** Subscription type restricted to 'group' or 'private'
 
