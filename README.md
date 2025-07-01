@@ -13,6 +13,8 @@ The ```schema.sql``` file can be found in the root directory of this repository.
 
 Finally run
  ```npm run start```
+
+
 The App will be listening on localhost:3000.
 
 
