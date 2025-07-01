@@ -151,15 +151,15 @@ Creates a new sport in the system.
 - **Response:** `Sport`
 
 **Example Request:**
-```json
-POST /sports/create
-Content-Type: application/json
+```bash
+curl -X POST http://localhost:3000/sports/create \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Basketball",
+    "subscription_price": 29.99,
+    "allowed_gender": "male"
+  }'
 
-{
-  "name": "Basketball",
-  "subscription_price": 29.99,
-  "allowed_gender": "male"
-}
 ```
 
 ### Get All Sports
