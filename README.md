@@ -20,6 +20,12 @@ The App will be listening on localhost:3000.
 
 
 Then create a second terminal tab, to hit the API endpoints with ```curl -X```.
+(Note: The curl command is not formatted for use with the windows CMD) which looks like this:
+```cmd
+  curl -X POST http://localhost:3000/members/create ^
+  -H "Content-Type: application/json" ^
+  -d "{\"first_name\": \"Alice\", \"last_name\": \"Smith\", \"gender\": \"female\", \"birthdate\": \"1985-03-20\"}"
+```
 
 
 # Members API Documentation
