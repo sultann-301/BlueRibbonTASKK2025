@@ -13,7 +13,7 @@ The ```schema.sql``` file can be found in the root directory of this repository.
 
 Finally run
  ```npm run start```
-
+The App will be listening on localhost:3000.
 Then create a second terminal tab, to hit the API endpoints with ```curl -X```.
 
 
