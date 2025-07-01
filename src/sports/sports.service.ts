@@ -11,6 +11,8 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 import { supabase } from '../supabase.client';
 import { Sport } from './sport.interface';
+import { CreateSportDto } from './dto/create-sport.dto';
+import { UpdateSportDto } from './dto/update-sport.dto';
 
 // Custom exceptions for better error categorization
 export class SportNotFoundError extends NotFoundException {
@@ -100,15 +102,8 @@ export class SportsService {
    * @throws SportValidationError if validation fails
    * @throws DatabaseError if database operation fails
    */
-  async createSport(sportData: {
-    name: string;
-    subscription_price: number;
-    allowed_gender: string;
-  }): Promise<Sport> {
+  async createSport(sportData: CreateSportDto): Promise<Sport> {
     try {
-      // Validate input data
-      this.validateSportData(sportData);
-
       this.logger.debug(`Creating sport: ${sportData.name}`);
 
       const { data, error } = await supabase
@@ -171,7 +166,10 @@ export class SportsService {
    * @throws SportValidationError if validation fails
    * @throws DatabaseError if database operation fails
    */
-  async updateSport(id: string, sportData: Partial<Sport>): Promise<Sport> {
+  async updateSport(
+    id: string,
+    sportData: Partial<UpdateSportDto>,
+  ): Promise<Sport> {
     try {
       if (!id) {
         throw new SportValidationError('Sport ID is required');
@@ -183,8 +181,6 @@ export class SportsService {
           'At least one field must be provided for update',
         );
       }
-
-      this.validatePartialSportData(sportData);
 
       this.logger.debug(`Updating sport with ID: ${id}`);
 
@@ -354,98 +350,6 @@ export class SportsService {
   }
 
   /**
-   * Validates sport data for creation.
-   * @param sportData - The sport data to validate
-   * @throws SportValidationError if validation fails
-   */
-  private validateSportData(sportData: {
-    name: string;
-    subscription_price: number;
-    allowed_gender: string;
-  }): void {
-    if (
-      !sportData.name ||
-      typeof sportData.name !== 'string' ||
-      sportData.name.trim().length === 0
-    ) {
-      throw new SportValidationError(
-        'Name is required and must be a non-empty string',
-      );
-    }
-
-    if (sportData.name.length > 100) {
-      throw new SportValidationError('Name must be 100 characters or less');
-    }
-
-    if (
-      typeof sportData.subscription_price !== 'number' ||
-      sportData.subscription_price < 0
-    ) {
-      throw new SportValidationError(
-        'Subscription price must be a non-negative number',
-      );
-    }
-
-    if (
-      !sportData.allowed_gender ||
-      typeof sportData.allowed_gender !== 'string'
-    ) {
-      throw new SportValidationError(
-        'Allowed gender is required and must be a string',
-      );
-    }
-
-    const validGenders = ['male', 'female', 'both', 'all'];
-    if (!validGenders.includes(sportData.allowed_gender.toLowerCase())) {
-      throw new SportValidationError(
-        `Allowed gender must be one of: ${validGenders.join(', ')}`,
-      );
-    }
-  }
-
-  /**
-   * Validates partial sport data for updates.
-   * @param sportData - The partial sport data to validate
-   * @throws SportValidationError if validation fails
-   */
-  private validatePartialSportData(sportData: Partial<Sport>): void {
-    if (sportData.name !== undefined) {
-      if (
-        typeof sportData.name !== 'string' ||
-        sportData.name.trim().length === 0
-      ) {
-        throw new SportValidationError('Name must be a non-empty string');
-      }
-      if (sportData.name.length > 100) {
-        throw new SportValidationError('Name must be 100 characters or less');
-      }
-    }
-
-    if (sportData.subscription_price !== undefined) {
-      if (
-        typeof sportData.subscription_price !== 'number' ||
-        sportData.subscription_price < 0
-      ) {
-        throw new SportValidationError(
-          'Subscription price must be a non-negative number',
-        );
-      }
-    }
-
-    if (sportData.allowed_gender !== undefined) {
-      if (typeof sportData.allowed_gender !== 'string') {
-        throw new SportValidationError('Allowed gender must be a string');
-      }
-      const validGenders = ['male', 'female', 'both', 'all'];
-      if (!validGenders.includes(sportData.allowed_gender.toLowerCase())) {
-        throw new SportValidationError(
-          `Allowed gender must be one of: ${validGenders.join(', ')}`,
-        );
-      }
-    }
-  }
-
-  /**
    * Invalidates the sports cache.
    */
   private async invalidateCache(): Promise<void> {
@@ -462,8 +366,4 @@ export class SportsService {
    * Manually refresh the sports cache.
    * @returns Promise<Sport[]> - Fresh sports data
    */
-  async refreshCache(): Promise<Sport[]> {
-    await this.invalidateCache();
-    return this.getSports();
-  }
 }
