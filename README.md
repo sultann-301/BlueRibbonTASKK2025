@@ -216,8 +216,8 @@ Deletes a sport by ID.
 - **Response:** `Sport`
 
 **Example Request:**
-```json
-DELETE /sports/delete/123
+```bash
+curl -X DELETE http://localhost:3000/sports/delete/123
 ```
 
 ## Data Types
