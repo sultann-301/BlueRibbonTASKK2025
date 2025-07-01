@@ -69,7 +69,7 @@ describe('MembersService', () => {
       (supabase.from as jest.Mock).mockReturnValue(mockChain);
 
       await expect(service.createMember(memberData)).rejects.toThrow(
-        'Error creating member: Fail',
+        'Failed to create member',
       );
     });
   });
@@ -112,7 +112,7 @@ describe('MembersService', () => {
       (supabase.from as jest.Mock).mockReturnValue(mockChain);
 
       await expect(service.deleteMember(id)).rejects.toThrow(
-        'Error deleting member: Fail',
+        'Failed to delete member',
       );
     });
   });
@@ -157,7 +157,7 @@ describe('MembersService', () => {
       (supabase.from as jest.Mock).mockReturnValue(mockChain);
 
       await expect(service.updateMember(id, updates)).rejects.toThrow(
-        'Error updating member: Fail',
+        'Failed to update member',
       );
     });
   });
@@ -197,7 +197,7 @@ describe('MembersService', () => {
       (supabase.from as jest.Mock).mockReturnValue(mockChain);
 
       await expect(service.getMember(id)).rejects.toThrow(
-        'Error finding member: Fail',
+        'Failed to retrieve member',
       );
     });
   });

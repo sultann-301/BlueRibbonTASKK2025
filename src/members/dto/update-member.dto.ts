@@ -1,4 +1,11 @@
-import { IsDate, IsIn, IsOptional, IsString } from 'class-validator';
+import {
+  IsDate,
+  IsIn,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateMemberDto {
@@ -12,6 +19,7 @@ export class UpdateMemberDto {
 
   @IsOptional()
   @IsDate()
+  @Type(() => Date)
   birthdate?: Date;
 
   @IsOptional()
@@ -22,4 +30,8 @@ export class UpdateMemberDto {
   @IsOptional()
   @IsIn(['male', 'female'])
   gender?: string;
+
+  @IsOptional()
+  @IsNumber()
+  central_member_id?: number;
 }
