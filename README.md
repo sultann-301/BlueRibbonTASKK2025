@@ -4,8 +4,12 @@ First, in the root directory of the project run:
  npm install
  ```
  Then add a ``.env`` file in the root of the project with the following
- ```SUPABASE_URL=https://yoursupabasedb.supabase.co ```
-```SUPABASE_SERVICE_ROLE_KEY=your-service-role-key```
+ ```bash
+ SUPABASE_URL=https://yoursupabasedb.supabase.co 
+ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
+Next, you need to open the linked supabase database, and copy the ```schema.sql``` file into the SQL editor and run the queries to create the table.
+The ```schema.sql``` file can be found in the root directory of this repository.
 
 Finally run
  ```npm run start```
