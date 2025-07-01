@@ -196,14 +196,14 @@ Updates an existing sport by ID.
 - **Response:** `Sport`
 
 **Example Request:**
-```json
-PATCH /sports/update/123
-Content-Type: application/json
+```bash
+curl -X PATCH http://localhost:3000/sports/update/123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Basketball",
+    "subscription_price": 35.00
+  }'
 
-{
-  "name": "Updated Basketball",
-  "subscription_price": 35.00
-}
 ```
 
 ### Delete Sport
